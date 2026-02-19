@@ -11,6 +11,7 @@ import { ErrorState } from "@/components/ErrorState";
 import { NotFoundState } from "@/components/NotFoundState";
 import { criarItem } from "@/services/item.service";
 import AddItemForm from "@/components/AddItem";
+import EditItemModal from "@/components/EditItemModal";
 
 export default function OrcamentoDetalhePage() {
     const router = useRouter();
@@ -30,6 +31,26 @@ export default function OrcamentoDetalhePage() {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [isFinalizando, setIsFinalizando] = useState<boolean>(false);
+    const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
+    const [selectedItem, setSelectedItem] = useState<Item>({
+        id: 0, 
+        descricao: "", 
+        quantidade: 0, 
+        valorUnitario: 0, 
+        valorTotal:0, 
+        quantidadeAcumulada:0, 
+        orcamentoId:0
+    });
+
+    function openEdit(item: Item) {
+        setSelectedItem(item);
+        setIsEditOpen(true);
+    }
+
+    function closeEdit() {
+        setIsEditOpen(false);
+        setSelectedItem(selectedItem);
+    }
 
     const load = async() => {
         try {
@@ -172,40 +193,57 @@ export default function OrcamentoDetalhePage() {
                         <div className="px-4 py-6 text-sm text-gray-600">Nenhum item cadastrado.</div>
                     ) : (
                         <div className="overflow-x-auto">
-                        <table className="w-full border-collapse">
-                            <thead className="bg-gray-50">
-                            <tr className="text-left text-xs font-semibold text-gray-600">
-                                <th className="px-4 py-3">Descrição</th>
-                                <th className="px-4 py-3">Qtd</th>
-                                <th className="px-4 py-3">V. Unit</th>
-                                <th className="px-4 py-3">V. Total</th>
-                                <th className="px-4 py-3">Qtd Acumulada</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {itens.map((item) => (
-                                <tr key={item.id} className="border-t border-gray-200 text-sm">
-                                <td className="px-4 py-3 text-gray-900">{item.descricao}</td>
-                                <td className="px-4 py-3 text-gray-700">{Number(item.quantidade)}</td>
-                                <td className="px-4 py-3 text-gray-700">
-                                    {Number(item.valorUnitario).toLocaleString("pt-BR", {
-                                    style: "currency",
-                                    currency: "BRL",
-                                    })}
-                                </td>
-                                <td className="px-4 py-3 text-gray-700">
-                                    {Number(item.valorTotal).toLocaleString("pt-BR", {
-                                    style: "currency",
-                                    currency: "BRL",
-                                    })}
-                                </td>
-                                <td className="px-4 py-3 text-gray-700">
-                                    {Number(item.quantidadeAcumulada)}
-                                </td>
-                                </tr>
-                            ))}
-                            </tbody>
-                        </table>
+                            <table className="w-full border-collapse">
+                                <thead className="bg-gray-50">
+                                    <tr className="text-left text-xs font-semibold text-gray-600">
+                                        <th className="px-4 py-3">Descrição</th>
+                                        <th className="px-4 py-3">Qtd</th>
+                                        <th className="px-4 py-3">V. Unit</th>
+                                        <th className="px-4 py-3">V. Total</th>
+                                        <th className="px-4 py-3">Qtd Acumulada</th>
+                                        <th className="px-4 py-3">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {itens.map((item) => (
+                                    <tr key={item.id} className="border-t border-gray-200 text-sm">
+                                        <td className="px-4 py-3 text-gray-900">{item.descricao}</td>
+                                        <td className="px-4 py-3 text-gray-700">{Number(item.quantidade)}</td>
+                                        <td className="px-4 py-3 text-gray-700">
+                                            {Number(item.valorUnitario).toLocaleString("pt-BR", {
+                                            style: "currency",
+                                            currency: "BRL",
+                                            })}
+                                        </td>
+                                        <td className="px-4 py-3 text-gray-700">
+                                            {Number(item.valorTotal).toLocaleString("pt-BR", {
+                                            style: "currency",
+                                            currency: "BRL",
+                                            })}
+                                        </td>
+                                        <td className="px-4 py-3 text-gray-700">
+                                            {Number(item.quantidadeAcumulada)}
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <button
+                                                type="button"
+                                                className="rounded-md border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-900 hover:bg-gray-50 disabled:opacity-60"
+                                                onClick={() => openEdit(item)}
+                                                disabled={orcamento.status !== "ABERTO"}
+                                            >
+                                                Editar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </table>
+                            <EditItemModal
+                                isOpen={isEditOpen}
+                                item={selectedItem}
+                                isDisabled={orcamento.status !== "ABERTO"}
+                                onClose={closeEdit}
+                                onUpdated={load}/>
                         </div>
                     )}
                 </section>
