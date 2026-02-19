@@ -20,6 +20,7 @@ export default function NovoOrcamentoPage() {
     const [error, setError] = useState<string | null>(null);
 
     const handleSubmit = async function (e: React.SubmitEvent) {
+        e.preventDefault();
         try {
             setIsSubmitting(true);
             setError(null);

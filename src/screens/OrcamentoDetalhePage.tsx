@@ -9,6 +9,8 @@ import { listarItensPorOrcamento } from "@/services/item.service";
 import { LoadingState } from "@/components/LoadingState";
 import { ErrorState } from "@/components/ErrorState";
 import { NotFoundState } from "@/components/NotFoundState";
+import { criarItem } from "@/services/item.service";
+import AddItemForm from "@/components/AddItem";
 
 export default function OrcamentoDetalhePage() {
     const router = useRouter();
@@ -44,7 +46,7 @@ export default function OrcamentoDetalhePage() {
         } finally {
             setIsLoading(false);
         }
-    }
+    };
 
     useEffect(() => { 
         load(); 
@@ -79,13 +81,13 @@ export default function OrcamentoDetalhePage() {
 
     if (isLoading) {
         return <LoadingState />;
-    }
+    };
     if (error) {
         return <ErrorState message={error} actionLabel="Voltar" onAction={() => router.push("/orcamentos")} />;
-    }
+    };
     if (!orcamento) {
         return <NotFoundState message="Orçamento não encontrado." />;
-    }
+    };
 
     return (
         <main className="min-h-screen bg-gray-50">
@@ -94,22 +96,17 @@ export default function OrcamentoDetalhePage() {
                     <div>
                         <h1 className="text-2xl font-semibold text-gray-900">Detalhe do Orçamento</h1>
                         <p className="mt-1 text-sm text-gray-600">
-                        Protocolo: <span className="font-medium text-gray-900">{orcamento.numeroProtocolo}</span>
+                            Protocolo: <span className="font-medium text-gray-900">{orcamento.numeroProtocolo}</span>
                         </p>
                     </div>
 
                     <div className="flex items-center gap-3">
-                        <button
-                            type="button"
-                            className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50"
+                        <button type="button" className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50"
                             onClick={() => router.push("/orcamentos")}>
                             Voltar
                         </button>
 
-                        <button
-                            type="button"
-                            onClick={handleFinalizar}
-                            disabled={!podeFinalizar || isFinalizando}
+                        <button type="button" onClick={handleFinalizar} disabled={!podeFinalizar || isFinalizando}
                             className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-60">
                             {isFinalizando ? "Finalizando..." : "Finalizar orçamento"}
                         </button>
@@ -125,9 +122,7 @@ export default function OrcamentoDetalhePage() {
                     <div className="rounded-lg bg-white p-4 shadow-sm ring-1 ring-gray-200">
                         <p className="text-xs text-gray-500">Status</p>
                         <p className="mt-1">
-                        <span
-                            className={
-                            orcamento.status === "ABERTO"
+                        <span className={ orcamento.status === "ABERTO"
                                 ? "inline-flex rounded-full bg-yellow-100 px-2 py-1 text-xs font-semibold text-yellow-800"
                                 : "inline-flex rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800"
                             }>
@@ -161,6 +156,12 @@ export default function OrcamentoDetalhePage() {
                         ) : null}
                     </div>
                 </section>
+
+                <AddItemForm
+                    orcamentoId={orcamento.id}
+                    isDisabled={orcamento.status !== "ABERTO"}
+                    onCreated={load}
+                    onError={(message) => setError(message)}/>
 
                 <section className="mt-6 rounded-lg bg-white shadow-sm ring-1 ring-gray-200">
                     <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
