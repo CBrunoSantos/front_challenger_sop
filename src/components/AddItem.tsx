@@ -17,24 +17,20 @@ export default function AddItemForm({ orcamentoId, isDisabled, onCreated, onErro
     const [isSubmittingItem, setIsSubmittingItem] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    async function handleCriarItem(e: React.SubmitEvent) {
+    const handleCriarItem = async function (e: React.SubmitEvent) {
         e.preventDefault();
 
         if (isDisabled) {
-            setError("Não é permitido incluir item em orçamento FINALIZADO.");
-            return;
+            return setError("Não é permitido incluir item em orçamento FINALIZADO.");
         }
         if (!descricao.trim()) {
-            setError("Informe a descrição do item.");
-            return;
+            return setError("Informe a descrição do item.");
         }
         if (!Number.isFinite(quantidade) || quantidade <= 0) {
-            setError("Informe uma quantidade válida.");
-            return;
+            return setError("Informe uma quantidade válida.");
         }
         if (!Number.isFinite(valorUnitario) || valorUnitario < 0) {
-            setError("Informe um valor unitário válido.");
-            return;
+            return setError("Informe um valor unitário válido.");
         }
         try {
             setIsSubmittingItem(true);
@@ -54,7 +50,7 @@ export default function AddItemForm({ orcamentoId, isDisabled, onCreated, onErro
             await onCreated();
         } catch (err: unknown) {
             if(err instanceof Error){
-                setError(err.message ?? "Erro ao criar orçamento.");
+                setError(err.message ?? "Erro ao criar item.");
             }
         }  finally {
             setIsSubmittingItem(false);
