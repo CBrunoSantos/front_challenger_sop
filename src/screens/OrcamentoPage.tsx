@@ -5,52 +5,58 @@ import { listarOrcamentos } from "@/services/orcamento.service";
 import type { Orcamento } from "@/types/orcamento";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
+import { fetchOrcamentos } from "@/store/slice/orcamentosSlice";
 
 export default function OrcamentosPage() {
-    const [orcamentos, setOrcamentos] = useState<Orcamento[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
-    const isMountedRef = useRef<boolean>(false);
     const router = useRouter();
+    const dispatch = useDispatch<AppDispatch>();
+    const { data, loading, error } = useSelector(
+        (state: RootState) => state.orcamentos
+    );
 
-    const load = async() => {
-        try {
-            setIsLoading(true);
-            setError(null);
-            const data = await listarOrcamentos();
-            if (isMountedRef.current) {
-                setOrcamentos(data);
-            }
-        } catch (error: unknown) {
-            if (isMountedRef.current) {
-                if (error instanceof Error) {
-                    setError(error.message);
-                } else {
-                    setError("Erro ao carregar orçamentos.");
-                }
-            }
-        } finally {
-            if (isMountedRef.current) {
-                setIsLoading(false);
-            }
-        }
-    }
+    // const load = async() => {
+    //     try {
+    //         setIsLoading(true);
+    //         setError(null);
+    //         const data = await listarOrcamentos();
+    //         if (isMountedRef.current) {
+    //             setOrcamentos(data);
+    //         }
+    //     } catch (error: unknown) {
+    //         if (isMountedRef.current) {
+    //             if (error instanceof Error) {
+    //                 setError(error.message);
+    //             } else {
+    //                 setError("Erro ao carregar orçamentos.");
+    //             }
+    //         }
+    //     } finally {
+    //         if (isMountedRef.current) {
+    //             setIsLoading(false);
+    //         }
+    //     }
+    // }
 
-    useEffect(() => {
-        isMountedRef.current = true;
-        load();
-        return () => {
-            isMountedRef.current = false;
-        };
-    }, []);
+    // useEffect(() => {
+    //     isMountedRef.current = true;
+    //     load();
+    //     return () => {
+    //         isMountedRef.current = false;
+    //     };
+    // }, []);
 
+      useEffect(() => {
+    dispatch(fetchOrcamentos());
+  }, [dispatch]);
     const totalAberto = useMemo(() => {
-        return orcamentos.filter((o) => o.status === "ABERTO").length;
-    }, [orcamentos]);
+        return data.filter((o) => o.status === "ABERTO").length;
+    }, [data]);
 
     const totalFinalizado = useMemo(() => {
-        return orcamentos.filter((o) => o.status === "FINALIZADO").length;
-    }, [orcamentos]);
+        return data.filter((o) => o.status === "FINALIZADO").length;
+    }, [data]);
 
 return (
     <main className="min-h-screen bg-gray-50">
@@ -83,11 +89,11 @@ return (
                     <h2 className="text-sm font-medium text-gray-900">Resultados</h2>
                 </div>
 
-                {isLoading ? (
+                {loading ? (
                     <div className="px-4 py-6 text-sm text-gray-600">Carregando...</div>
                 ) : error ? (
                     <div className="px-4 py-6 text-sm text-red-600">{error}</div>
-                ) : orcamentos.length === 0 ? (
+                ) : data.length === 0 ? (
                     <div className="px-4 py-6 text-sm text-gray-600">
                         Nenhum orçamento encontrado.
                     </div>
@@ -105,7 +111,7 @@ return (
                                 </tr>
                             </thead>
                             <tbody>
-                                {orcamentos.map((o) => (
+                                {data.map((o) => (
                                     <tr key={o.id} className="border-t border-gray-200 text-sm">
                                         <td className="px-4 py-3 text-gray-900">
                                             <Link href={`/orcamentos/${o.id}`} className="text-gray-900 hover:underline">
