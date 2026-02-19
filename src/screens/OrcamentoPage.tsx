@@ -4,12 +4,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { listarOrcamentos } from "@/services/orcamento.service";
 import type { Orcamento } from "@/types/orcamento";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function OrcamentosPage() {
     const [orcamentos, setOrcamentos] = useState<Orcamento[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const isMountedRef = useRef<boolean>(false);
+    const router = useRouter();
 
     const load = async() => {
         try {
@@ -94,11 +96,12 @@ return (
                         <table className="w-full border-collapse">
                             <thead className="bg-gray-50">
                                 <tr className="text-left text-xs font-semibold text-gray-600">
-                                <th className="px-4 py-3">Protocolo</th>
-                                <th className="px-4 py-3">Tipo</th>
-                                <th className="px-4 py-3">Valor</th>
-                                <th className="px-4 py-3">Data</th>
-                                <th className="px-4 py-3">Status</th>
+                                    <th className="px-4 py-3">Protocolo</th>
+                                    <th className="px-4 py-3">Tipo</th>
+                                    <th className="px-4 py-3">Valor</th>
+                                    <th className="px-4 py-3">Data</th>
+                                    <th className="px-4 py-3">Status</th>
+                                    <th className="px-4 py-3">Ação</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -124,6 +127,12 @@ return (
                                                 }>
                                                 {o.status}
                                             </span>
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <button type="button" onClick={() => router.push(`/orcamentos/${o.id}`)}
+                                                className="rounded-md border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-900 hover:bg-gray-50">
+                                                Visualizar
+                                            </button>
                                         </td>
                                     </tr>
                                 ))}
