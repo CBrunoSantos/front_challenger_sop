@@ -77,7 +77,7 @@ export default function NovoOrcamentoPage() {
                             <label className="text-sm font-medium text-gray-900">Valor total</label>
                             <input
                                 value={valorTotal}
-                                onChange={(e) => setValorTotal(parseFloat(e.target.value))}
+                                onChange={(e) => setValorTotal(e.target.value === "" ? 0 : parseFloat(e.target.value))}
                                 inputMode="decimal"
                                 placeholder="1500.00"
                                 className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-400"

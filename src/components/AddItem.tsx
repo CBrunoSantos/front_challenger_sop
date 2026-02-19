@@ -82,14 +82,14 @@ export default function AddItemForm({ orcamentoId, isDisabled, onCreated, onErro
 
                 <div>
                     <label className="text-sm font-medium text-gray-900">Quantidade</label>
-                    <input value={quantidade} onChange={(e) => setQuantidade(parseFloat(e.target.value))} inputMode="decimal"
+                    <input value={quantidade} onChange={(e) => setQuantidade(e.target.value === "" ? 0 : parseFloat(e.target.value))} inputMode="decimal"
                         className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-400"
                         disabled={isDisabled || isSubmittingItem}/>
                 </div>
 
                 <div>
                     <label className="text-sm font-medium text-gray-900">Valor unitário</label>
-                    <input value={valorUnitario} onChange={(e) => setValorUnitario(parseFloat(e.target.value))} inputMode="decimal"
+                    <input value={valorUnitario} onChange={(e) => setValorUnitario(e.target.value === "" ? 0 : parseFloat(e.target.value))} inputMode="decimal"
                         className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-400"
                         disabled={isDisabled || isSubmittingItem}/>
                 </div>
