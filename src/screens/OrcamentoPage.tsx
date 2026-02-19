@@ -60,7 +60,7 @@ return (
                         Lista de orçamentos cadastrados no sistema.
                     </p>
                 </div>
-                <Link href="/orcamento/NovoOrcamento" 
+                <Link href="/orcamentos/NovoOrcamento" 
                     className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800">
                     Novo orçamento
                 </Link>
