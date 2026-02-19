@@ -1,8 +1,7 @@
-import Image from "next/image";
-import HomePage from "@/screens/HomePage";
+import OrcamentoComponent from "./orcamento/page";
 
 export default function Home() {
   return (
-    <HomePage/>
+    <OrcamentoComponent/>
   );
 }
