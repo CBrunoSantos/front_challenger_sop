@@ -1,36 +1,152 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📘 Desafio SOP --- Frontend
 
-## Getting Started
+Frontend da aplicação de **controle de Orçamentos, Itens e Medições**,
+desenvolvido com:
 
-First, run the development server:
+-   **Next.js (App Router)**
+-   **React**
+-   **TypeScript**
+-   **Axios**
+-   **TailwindCSS**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Este frontend consome a API desenvolvida em **Spring Boot +
+PostgreSQL**.
+
+------------------------------------------------------------------------
+
+# 📌 Objetivo do Sistema
+
+Gerenciar:
+
+-   Orçamentos\
+-   Itens do orçamento\
+-   Medições\
+-   Itens da medição\
+-   Regras de negócio relacionadas a controle de quantidades e
+    validações
+
+------------------------------------------------------------------------
+
+# 🏗 Arquitetura do Projeto
+
+## Estrutura de Pastas
+
+    src/
+    │
+    ├── app/
+    │   ├── orcamentos/
+    │   │   ├── page.tsx
+    │   │   ├── novo/
+    │   │   │   └── page.tsx
+    │   │   ├── [id]/
+    │   │   │   └── page.tsx
+    │
+    ├── screens/
+    │   ├── orcamentos/
+    │   │   ├── OrcamentosPage.tsx
+    │   │   ├── NovoOrcamentoPage.tsx
+    │   │   ├── OrcamentoDetalhePage.tsx
+    │
+    ├── components/
+    │   ├── orcamentos/
+    │   │   ├── ItensSection.tsx
+    │   │   ├── MedicoesSection.tsx
+    │   │   ├── MedicaoAbertaEditor.tsx
+    │
+    ├── services/
+    │   ├── api.ts
+    │   ├── orcamentos.service.ts
+    │   ├── itens.service.ts
+    │   ├── medicoes.service.ts
+    │
+    ├── types/
+    │   ├── orcamento.types.ts
+    │   ├── item.types.ts
+    │   ├── medicao.types.ts
+
+------------------------------------------------------------------------
+
+# 🧠 Padrão Arquitetural Utilizado
+
+## 1️⃣ App Router apenas como roteador
+
+Os arquivos dentro de `app/` são responsáveis apenas por expor a rota.
+
+Exemplo:
+
+``` ts
+// app/orcamentos/page.tsx
+import OrcamentosPage from "@/screens/orcamentos/OrcamentosPage";
+
+export default function Page() {
+  return <OrcamentosPage />;
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Toda lógica de estado, chamadas HTTP e renderização ficam na pasta
+`screens`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+------------------------------------------------------------------------
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 2️⃣ Separação de Responsabilidades
 
-## Learn More
+  Camada        Responsabilidade
+  ------------- ---------------------------
+  app/          Definição de rota
+  screens/      Lógica da página
+  components/   Componentes reutilizáveis
+  services/     Integração com API
+  types/        Tipagem da aplicação
 
-To learn more about Next.js, take a look at the following resources:
+------------------------------------------------------------------------
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# 🌐 Configuração da API
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Base URL
 
-## Deploy on Vercel
+Arquivo `services/api.ts`:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+``` ts
+import axios from "axios";
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+export const api = axios.create({
+  baseURL: "http://localhost:8080",
+});
+```
+
+------------------------------------------------------------------------
+
+# 🚀 Como Rodar o Projeto
+
+## 1️⃣ Instalar dependências
+
+``` bash
+npm install
+```
+
+ou
+
+``` bash
+yarn
+```
+
+## 2️⃣ Rodar ambiente de desenvolvimento
+
+``` bash
+npm run dev
+```
+
+Aplicação estará disponível em:
+
+    http://localhost:3000
+
+------------------------------------------------------------------------
+
+# 📌 Requisitos para Funcionamento
+
+-   Node 18+
+-   Backend rodando em `http://localhost:8080`
+-   PostgreSQL configurado
+
+------------------------------------------------------------------------
+
