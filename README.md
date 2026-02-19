@@ -1,4 +1,4 @@
-# 📘 Desafio SOP --- Frontend
+# Desafio SOP --- Frontend
 
 Frontend da aplicação de **controle de Orçamentos, Itens e Medições**,
 desenvolvido com:
@@ -8,13 +8,14 @@ desenvolvido com:
 -   **TypeScript**
 -   **Axios**
 -   **TailwindCSS**
+-   **Redux**
 
 Este frontend consome a API desenvolvida em **Spring Boot +
 PostgreSQL**.
 
 ------------------------------------------------------------------------
 
-# 📌 Objetivo do Sistema
+# Objetivo do Sistema
 
 Gerenciar:
 
@@ -27,7 +28,7 @@ Gerenciar:
 
 ------------------------------------------------------------------------
 
-# 🏗 Arquitetura do Projeto
+# Arquitetura do Projeto
 
 ## Estrutura de Pastas
 
@@ -66,9 +67,9 @@ Gerenciar:
 
 ------------------------------------------------------------------------
 
-# 🧠 Padrão Arquitetural Utilizado
+# Padrão Arquitetural Utilizado
 
-## 1️⃣ App Router apenas como roteador
+## 1️App Router apenas como roteador
 
 Os arquivos dentro de `app/` são responsáveis apenas por expor a rota.
 
@@ -88,7 +89,7 @@ Toda lógica de estado, chamadas HTTP e renderização ficam na pasta
 
 ------------------------------------------------------------------------
 
-## 2️⃣ Separação de Responsabilidades
+## Separação de Responsabilidades
 
   Camada        Responsabilidade
   ------------- ---------------------------
@@ -100,7 +101,7 @@ Toda lógica de estado, chamadas HTTP e renderização ficam na pasta
 
 ------------------------------------------------------------------------
 
-# 🌐 Configuração da API
+# Configuração da API
 
 ## Base URL
 
@@ -116,9 +117,9 @@ export const api = axios.create({
 
 ------------------------------------------------------------------------
 
-# 🚀 Como Rodar o Projeto
+# Como Rodar o Projeto
 
-## 1️⃣ Instalar dependências
+## Instalar dependências
 
 ``` bash
 npm install
@@ -130,7 +131,7 @@ ou
 yarn
 ```
 
-## 2️⃣ Rodar ambiente de desenvolvimento
+## Rodar ambiente de desenvolvimento
 
 ``` bash
 npm run dev
@@ -142,7 +143,7 @@ Aplicação estará disponível em:
 
 ------------------------------------------------------------------------
 
-# 📌 Requisitos para Funcionamento
+# Requisitos para Funcionamento
 
 -   Node 18+
 -   Backend rodando em `http://localhost:8080`
