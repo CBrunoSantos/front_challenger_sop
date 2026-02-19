@@ -12,6 +12,7 @@ import { NotFoundState } from "@/components/NotFoundState";
 import { criarItem } from "@/services/item.service";
 import AddItemForm from "@/components/AddItem";
 import EditItemModal from "@/components/EditItemModal";
+import MedicoesSection from "@/components/MedicoesSection";
 
 export default function OrcamentoDetalhePage() {
     const router = useRouter();
@@ -247,6 +248,10 @@ export default function OrcamentoDetalhePage() {
                         </div>
                     )}
                 </section>
+                <MedicoesSection
+                    orcamentoId={orcamento.id}
+                    itensOrcamento={itens}
+                    isOrcamentoFinalizado={orcamento.status !== "ABERTO"}/>
             </div>
         </main>
     );
