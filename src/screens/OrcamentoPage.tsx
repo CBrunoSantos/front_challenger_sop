@@ -40,7 +40,7 @@ export default function OrcamentosPage() {
         return () => {
             isMountedRef.current = false;
         };
-    }, [load]);
+    }, []);
 
     const totalAberto = useMemo(() => {
         return orcamentos.filter((o) => o.status === "ABERTO").length;
