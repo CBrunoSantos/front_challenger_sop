@@ -141,6 +141,8 @@ Aplicação estará disponível em:
 
     http://localhost:3000
 
+    https://front-challenger-sop.vercel.app/
+
 ------------------------------------------------------------------------
 
 # Requisitos para Funcionamento
