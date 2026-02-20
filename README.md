@@ -69,7 +69,7 @@ Gerenciar:
 
 # Padrão Arquitetural Utilizado
 
-## 1️App Router apenas como roteador
+## App Router apenas como roteador
 
 Os arquivos dentro de `app/` são responsáveis apenas por expor a rota.
 
@@ -91,13 +91,13 @@ Toda lógica de estado, chamadas HTTP e renderização ficam na pasta
 
 ## Separação de Responsabilidades
 
-  Camada        Responsabilidade
-  ------------- ---------------------------
-  app/          Definição de rota
-  screens/      Lógica da página
-  components/   Componentes reutilizáveis
-  services/     Integração com API
-  types/        Tipagem da aplicação
+| Camada       | Responsabilidade             |
+|--------------|------------------------------|
+| app/         | Definição de rota            |
+| screens/     | Lógica da página             |
+| components/  | Componentes reutilizáveis    |
+| services/    | Integração com API           |
+| types/       | Tipagem da aplicação         |
 
 ------------------------------------------------------------------------
 
