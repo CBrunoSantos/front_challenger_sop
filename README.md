@@ -153,3 +153,7 @@ Aplicação estará disponível em:
 
 ------------------------------------------------------------------------
 
+![DER](https://i.postimg.cc/nV6kHz3D/image.png) 
+![DER](https://i.postimg.cc/wBfXnTt8/image.png)
+![DER](https://i.postimg.cc/Nf61BxyJ/image.png) 
+![DER](https://i.postimg.cc/pT5F7Qbc/image.png)
