@@ -2,6 +2,18 @@
 
 import { useState } from "react";
 import { criarItem } from "@/services/item.service";
+import {
+    Alert,
+    Button,
+    Card,
+    Group,
+    NumberInput,
+    SimpleGrid,
+    Stack,
+    Text,
+    TextInput,
+} from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 
 type Props = {
     orcamentoId: number;
@@ -16,6 +28,8 @@ export default function AddItemForm({ orcamentoId, isDisabled, onCreated, onErro
     const [valorUnitario, setValorUnitario] = useState<number>(0);
     const [isSubmittingItem, setIsSubmittingItem] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const isMobile = useMediaQuery('(max-width: 48em)');
+    const disabledByState = isDisabled || isSubmittingItem;
 
     const handleCriarItem = async function (e: React.SubmitEvent) {
         e.preventDefault();
@@ -58,51 +72,57 @@ export default function AddItemForm({ orcamentoId, isDisabled, onCreated, onErro
     };
 
     return (
-        <section className="mt-6 rounded-lg bg-white p-4 shadow-sm ring-1 ring-gray-200">
-            <div className="flex items-center justify-between">
-                <h2 className="text-sm font-medium text-gray-900">Adicionar item</h2>
+        <Card withBorder radius="md" p="md" mt="md">
+            <Group justify="space-between" align="center" wrap="wrap">
+                <Text size="sm" fw={600}>
+                    Adicionar item
+                </Text>
+
                 {isDisabled ? (
-                    <span className="text-xs text-gray-500">
+                    <Text size="xs" c="dimmed">
                         Orçamento finalizado: inclusão bloqueada.
-                    </span>
+                    </Text>
                 ) : null}
-            </div>
+            </Group>
 
-            <form className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3" onSubmit={handleCriarItem}>
-                <div className="sm:col-span-3">
-                    <label className="text-sm font-medium text-gray-900">Descrição</label>
-                    <input value={descricao} onChange={(e) => setDescricao(e.target.value)}
-                        className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-400"
-                        disabled={isDisabled || isSubmittingItem}/>
-                </div>
+            <form onSubmit={handleCriarItem}>
+                <Stack gap="sm" mt="md">
+                    <TextInput label="Descrição" value={descricao} onChange={(e) => {
+                        setDescricao(e.currentTarget.value); 
+                        if (error) { 
+                            setError(null)
+                        }
+                    }} disabled={disabledByState} required/>
 
-                <div>
-                    <label className="text-sm font-medium text-gray-900">Quantidade</label>
-                    <input value={quantidade} onChange={(e) => setQuantidade(e.target.value === "" ? 0 : parseFloat(e.target.value))} inputMode="decimal"
-                        className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-400"
-                        disabled={isDisabled || isSubmittingItem}/>
-                </div>
+                    <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="sm">
+                        <NumberInput label="Quantidade" value={quantidade}
+                            onChange={(value) => {
+                                setQuantidade(typeof value === 'number' ? value : 0);
+                                if (error) {
+                                    setError(null);
+                                }
+                            }} disabled={disabledByState} min={0} decimalScale={3} hideControls required/>
+                        <NumberInput label="Valor unitário" value={valorUnitario}
+                            onChange={(value) => {
+                                setValorUnitario(typeof value === 'number' ? value : 0);
+                                if (error) {
+                                setError(null);
+                                }
+                            }} disabled={disabledByState} min={0} decimalScale={2} hideControls required/>
+                        <Group align="flex-end">
+                            <Button type="submit" loading={isSubmittingItem} disabled={isDisabled} fullWidth>
+                                Adicionar
+                            </Button>
+                        </Group>
+                    </SimpleGrid>
 
-                <div>
-                    <label className="text-sm font-medium text-gray-900">Valor unitário</label>
-                    <input value={valorUnitario} onChange={(e) => setValorUnitario(e.target.value === "" ? 0 : parseFloat(e.target.value))} inputMode="decimal"
-                        className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-400"
-                        disabled={isDisabled || isSubmittingItem}/>
-                </div>
-
-                <div className="flex items-end">
-                    <button type="submit" disabled={isDisabled || isSubmittingItem}
-                        className="w-full rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-60">
-                        {isSubmittingItem ? "Salvando..." : "Adicionar"}
-                    </button>
-                </div>
-
-                {error ? (
-                    <div className="sm:col-span-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
-                        {error}
-                    </div>
-                ) : null}
+                    {error ? (
+                        <Alert  color="red" variant="light">
+                            {error}
+                        </Alert>
+                    ) : null}
+                </Stack>
             </form>
-        </section>
+        </Card>
     );
 }

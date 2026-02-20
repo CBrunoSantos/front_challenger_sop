@@ -9,6 +9,20 @@ import {
     validarMedicao,
 } from "@/services/medicao.service";
 import MedicaoAbertaEditor from "@/components/MedicaoAbertaEditor";
+import {
+    Alert,
+    Badge,
+    Button,
+    Card,
+    Group,
+    ScrollArea,
+    SimpleGrid,
+    Stack,
+    Table,
+    Text,
+    TextInput,
+} from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 
 type Props = {
     orcamentoId: number;
@@ -20,13 +34,12 @@ export default function MedicoesSection({ orcamentoId, itensOrcamento, isOrcamen
     const [medicoes, setMedicoes] = useState<Medicao[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-
     const [numero, setNumero] = useState<string>("");
     const [dataMedicao, setDataMedicao] = useState<string>("");
     const [observacao, setObservacao] = useState<string>("");
-
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [isValidando, setIsValidando] = useState<boolean>(false);
+    const isMobile = useMediaQuery('(max-width: 48em)');
 
     const load = async function () {
         try {
@@ -48,6 +61,8 @@ export default function MedicoesSection({ orcamentoId, itensOrcamento, isOrcamen
     const medicaoAberta = useMemo(() => {
         return medicoes.find((m) => m.status === "ABERTA");
     }, [medicoes]);
+
+    const disableCreate = isOrcamentoFinalizado || Boolean(medicaoAberta) || isSubmitting;
 
     const handleCriarMedicao = async function (e: React.SubmitEvent) {
         e.preventDefault();
@@ -108,110 +123,108 @@ export default function MedicoesSection({ orcamentoId, itensOrcamento, isOrcamen
     }
 
     return (
-        <section className="mt-6 rounded-lg bg-white shadow-sm ring-1 ring-gray-200">
-            <div className="border-b border-gray-200 px-4 py-3">
-                <h2 className="text-sm font-medium text-gray-900">Medições</h2>
-            </div>
-            <div className="px-4 py-4">
+        <Card withBorder radius="md" padding={0} mt="md">
+            <Group px="md" py="sm" style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}>
+                <Text size="sm" fw={600}>
+                    Medições
+                </Text>
+            </Group>
+            <Stack px="md" py="md" gap="md">
                 {isLoading ? (
-                    <div className="text-sm text-gray-600">Carregando medições...</div>
+                    <Text size="sm" c="dimmed">Carregando medições...</Text>
                 ) : null}
 
                 {error ? (
-                    <div className="mb-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>
+                    <Alert color="red" variant="light">{error}</Alert>
                 ) : null}
 
-                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                    <div className="rounded-md border border-gray-200 p-4">
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-sm font-semibold text-gray-900">Nova medição</h3>
+                <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="md">
+                    <Card withBorder radius="md" p="md">
+                        <Group justify="space-between" align="center" wrap="wrap">
+                            <Text size="sm" fw={600}>
+                                Nova medição
+                            </Text>
                             {isOrcamentoFinalizado ? (
-                                <span className="text-xs text-gray-500">Orçamento finalizado</span>
+                                <Text size="xs" c="dimmed">
+                                    Orçamento finalizado
+                                </Text>
                             ) : medicaoAberta ? (
-                                <span className="text-xs text-gray-500">Existe medição ABERTA</span>
+                                <Text size="xs" c="dimmed">
+                                    Existe medição ABERTA
+                                </Text>
                             ) : null}
-                        </div>
+                        </Group>
 
-                        <form className="mt-3 space-y-3" onSubmit={handleCriarMedicao}>
-                            <div>
-                                <label className="text-sm font-medium text-gray-900">Número</label>
-                                <input value={numero} onChange={(e) => setNumero(e.target.value)}
-                                    className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-400"
-                                    disabled={isOrcamentoFinalizado || Boolean(medicaoAberta) || isSubmitting}/>
-                            </div>
-
-                            <div>
-                                <label className="text-sm font-medium text-gray-900">Data (YYYY-MM-DD)</label>
-                                <input type="data" value={dataMedicao} onChange={(e) => setDataMedicao(e.target.value)}
-                                    className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-400"
-                                    disabled={isOrcamentoFinalizado || Boolean(medicaoAberta) || isSubmitting}/>
-                            </div>
-
-                            <div>
-                                <label className="text-sm font-medium text-gray-900">Observação</label>
-                                <input value={observacao} onChange={(e) => setObservacao(e.target.value)}
-                                    className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-400"
-                                    disabled={isOrcamentoFinalizado || Boolean(medicaoAberta) || isSubmitting}/>
-                            </div>
-
-                            <button type="submit"
-                                className="w-full rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-60"
-                                disabled={isOrcamentoFinalizado || Boolean(medicaoAberta) || isSubmitting}>
-                                {isSubmitting ? "Criando..." : "Criar medição"}
-                            </button>
+                        <form onSubmit={handleCriarMedicao}>
+                            <Stack gap="sm" mt="sm">
+                                <TextInput label="Número" value={numero} onChange={(e) => setNumero(e.currentTarget.value)} disabled={disableCreate} required/>
+                                <TextInput label="Data" type="date" value={dataMedicao} onChange={(e) => setDataMedicao(e.currentTarget.value)} disabled={disableCreate}
+                                    required description="Formato: YYYY-MM-DD"/>
+                                <TextInput label="Observação" value={observacao} onChange={(e) => setObservacao(e.currentTarget.value)} disabled={disableCreate}/>
+                                <Button type="submit" fullWidth loading={isSubmitting} disabled={disableCreate}>
+                                    Criar medição
+                                </Button>
+                            </Stack>
                         </form>
-                    </div>
-                    <div className="rounded-md border border-gray-200 p-4">
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-sm font-semibold text-gray-900">Histórico</h3>
+                    </Card>
+                    <Card withBorder radius="md" p="md">
+                        <Group justify="space-between" align="center" wrap="wrap">
+                            <Text size="sm" fw={600}> Histórico</Text>
                             {medicaoAberta ? (
-                                <button type="button" onClick={handleValidarMedicao} disabled={isValidando}
-                                    className="rounded-md bg-gray-900 px-3 py-2 text-xs font-medium text-white hover:bg-gray-800 disabled:opacity-60">
-                                    {isValidando ? "Validando..." : "Validar medição aberta"}
-                                </button>
+                                <Button type="button" size="xs" onClick={handleValidarMedicao} loading={isValidando} disabled={isOrcamentoFinalizado}>
+                                    Validar medição aberta
+                                </Button>
                             ) : null}
-                        </div>
+                        </Group>
                         {medicoes.length === 0 && !isLoading ? (
-                            <div className="mt-3 text-sm text-gray-600">Nenhuma medição cadastrada.</div>
+                            <Text size="sm" c="dimmed" mt="sm">
+                                Nenhuma medição cadastrada.
+                            </Text>
                         ) : null}
                         {medicoes.length > 0 ? (
-                            <div className="mt-3 overflow-x-auto">
-                                <table className="w-full border-collapse">
-                                    <thead className="bg-gray-50">
-                                        <tr className="text-left text-xs font-semibold text-gray-600">
-                                            <th className="px-3 py-2">Número</th>
-                                            <th className="px-3 py-2">Data</th>
-                                            <th className="px-3 py-2">Status</th>
-                                            <th className="px-3 py-2">Valor</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {medicoes.map((m) => (
-                                        <tr key={m.id} className="border-t border-gray-200 text-sm">
-                                            <td className="px-3 py-2 text-gray-900">{m.numero}</td>
-                                            <td className="px-3 py-2 text-gray-700">{m.dataMedicao}</td>
-                                            <td className="px-3 py-2">
-                                            <span className={m.status === "ABERTA"
-                                                    ? "inline-flex rounded-full bg-yellow-100 px-2 py-1 text-xs font-semibold text-yellow-800"
-                                                    : "inline-flex rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800"}>
-                                                {m.status}
-                                            </span>
-                                            </td>
-                                            <td className="px-3 py-2 text-gray-700">
-                                                {Number(m.valorTotal).toLocaleString("pt-BR", {
-                                                    style: "currency",
-                                                    currency: "BRL",
-                                                })}
-                                            </td>
-                                        </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                            <ScrollArea mt="sm">
+                                <Table striped highlightOnHover miw={650}>
+                                    <Table.Thead>
+                                        <Table.Tr>
+                                            <Table.Th>Número</Table.Th>
+                                            <Table.Th>Data</Table.Th>
+                                            <Table.Th>Status</Table.Th>
+                                            <Table.Th>Valor</Table.Th>
+                                        </Table.Tr>
+                                    </Table.Thead>
+                                    <Table.Tbody>
+                                        {medicoes.map((m) => {
+                                            const badgeColor = m.status === 'ABERTA' ? 'yellow' : 'green';
+                                            return(
+                                                <Table.Tr key={m.id}>
+                                                    <Table.Td>
+                                                        <Text size="sm">{m.numero}</Text>
+                                                    </Table.Td>
+                                                    <Table.Td>
+                                                        <Text size="sm">{m.dataMedicao}</Text>
+                                                    </Table.Td>
+                                                    <Table.Td>
+                                                        <Badge color={badgeColor} variant="light">
+                                                            {m.status}
+                                                        </Badge>
+                                                    </Table.Td>
+                                                    <Table.Td>
+                                                        <Text size="sm" c="dimmed">
+                                                            {Number(m.valorTotal).toLocaleString("pt-BR", {
+                                                                style: "currency",
+                                                                currency: "BRL",
+                                                            })}
+                                                        </Text>
+                                                    </Table.Td>
+                                                </Table.Tr>
+                                            )
+                                        })}
+                                    </Table.Tbody>
+                                </Table>
+                            </ScrollArea>
                         ) : null}
-                    </div>
-                </div>
-
+                    </Card>
+                </SimpleGrid>
                 {medicaoAberta ? (
                     <MedicaoAbertaEditor
                         medicaoId={medicaoAberta.id}
@@ -219,7 +232,7 @@ export default function MedicoesSection({ orcamentoId, itensOrcamento, isOrcamen
                         onChanged={load}
                     />
                 ) : null}
-            </div>
-        </section>
+            </Stack>
+        </Card>
     );
 }

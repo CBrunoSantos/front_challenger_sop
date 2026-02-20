@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@mantine/core": "^8.3.15",
+    "@mantine/hooks": "^8.3.15",
     "@reduxjs/toolkit": "^2.11.2",
     "axios": "^1.13.5",
     "next": "16.1.6",

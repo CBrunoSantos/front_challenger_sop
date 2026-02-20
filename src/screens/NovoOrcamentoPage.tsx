@@ -4,6 +4,20 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { criarOrcamento } from "@/services/orcamento.service";
 import type { OrcamentoTipo } from "@/types/orcamento";
+import {
+    Button,
+    Card,
+    Container,
+    Group,
+    NumberInput,
+    Select,
+    Stack,
+    Text,
+    TextInput,
+    Title,
+    Alert,
+} from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 
 const TIPOS: { value: OrcamentoTipo; label: string }[] = [
     { value: "OBRA_EDIFICACAO", label: "Obra de Edificação" },
@@ -18,6 +32,7 @@ export default function NovoOrcamentoPage() {
     const [valorTotal, setValorTotal] = useState<number>(0);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const isMobile = useMediaQuery('(max-width: 48em)');
 
     const handleSubmit = async function (e: React.SubmitEvent) {
         e.preventDefault();
@@ -40,78 +55,52 @@ export default function NovoOrcamentoPage() {
     }
 
     return (
-        <main className="min-h-screen bg-gray-50">
-            <div className="mx-auto max-w-2xl px-4 py-8">
-                <header className="mb-6">
-                    <h1 className="text-2xl font-semibold text-gray-900">Novo Orçamento</h1>
-                    <p className="mt-1 text-sm text-gray-600">
+        <Container size="sm" py="md">
+            <Stack gap="md">
+                <div>
+                    <Title order={2}>Novo Orçamento</Title>
+                    <Text size="sm" c="dimmed" mt={4}>
                         Preencha os dados abaixo para cadastrar um novo orçamento.
-                    </p>
-                </header>
+                    </Text>
+                </div>
+                <Card withBorder radius="md" p="lg">
+                    <form onSubmit={handleSubmit}>
+                        <Stack gap="sm">
+                            <TextInput label="Número do protocolo" placeholder="Ex: 43022.123456/2026-01" value={numeroProtocolo}
+                                onChange={(e) => setNumeroProtocolo(e.currentTarget.value)} disabled={isSubmitting} required/>
 
-                <section className="rounded-lg bg-white p-6 shadow-sm ring-1 ring-gray-200">
-                    <form className="space-y-4" onSubmit={handleSubmit}>
-                        <div>
-                            <label className="text-sm font-medium text-gray-900">Número do protocolo</label>
-                            <input
-                                value={numeroProtocolo}
-                                onChange={(e) => setNumeroProtocolo(e.target.value)}
-                                placeholder='Ex: 43022.123456/2026-01'
-                                className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-400"
-                            />
-                        </div>
+                            <Select label="Tipo de orçamento" value={tipo} 
+                                onChange={(value) => {
+                                    if (value) {
+                                        setTipo(value as OrcamentoTipo);
+                                    }
+                                }} data={TIPOS.map((t) => ({ value: t.value, label: t.label }))} disabled={isSubmitting} required searchable={false} allowDeselect={false}/>
 
-                        <div>
-                            <label className="text-sm font-medium text-gray-900">Tipo de orçamento</label>
-                            <select value={tipo} onChange={(e) => setTipo(e.target.value as OrcamentoTipo)}
-                                className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-400">
-                                {TIPOS.map((t) => (
-                                    <option key={t.value} value={t.value}>
-                                        {t.label}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                            <NumberInput label="Valor total" placeholder="1500.00" value={valorTotal} onChange={(value) => setValorTotal(typeof value === 'number' ? value : 0)}
+                                disabled={isSubmitting} min={0} decimalScale={2} thousandSeparator="." decimalSeparator="," hideControls required />
 
-                        <div>
-                            <label className="text-sm font-medium text-gray-900">Valor total</label>
-                            <input
-                                value={valorTotal}
-                                onChange={(e) => setValorTotal(e.target.value === "" ? 0 : parseFloat(e.target.value))}
-                                inputMode="decimal"
-                                placeholder="1500.00"
-                                className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-400"
-                            />
-                            <p className="mt-1 text-xs text-gray-500">
-                                Use ponto para decimais (ex: 1500.00).
-                            </p>
-                        </div>
+                            <Text size="xs" c="dimmed">
+                                Use ponto para decimais no backend; aqui no input já formatamos no padrão BR.
+                            </Text>
 
-                        {error ? (
-                            <div className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
-                                {error}
-                            </div>
-                        ) : null}
+                            {error ? (
+                                <Alert color="red" variant="light">
+                                    {error}
+                                </Alert>
+                            ) : null}
 
-                        <div className="flex items-center justify-end gap-3 pt-2">
-                            <button
-                                type="button"
-                                onClick={() => router.push("/orcamentos")}
-                                className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50"
-                                disabled={isSubmitting}>
-                                Cancelar
-                            </button>
-
-                            <button
-                                type="submit"
-                                className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-60"
-                                disabled={isSubmitting}>
-                                {isSubmitting ? "Salvando..." : "Criar orçamento"}
-                            </button>
-                        </div>
+                            <Group justify="flex-end" gap="sm" mt="xs" wrap="wrap">
+                                <Button type="button" variant="default" onClick={() => router.push('/orcamentos')} disabled={isSubmitting}  fullWidth={isMobile}>
+                                    Cancelar
+                                </Button>
+                                <Button type="submit" loading={isSubmitting} fullWidth={isMobile}>
+                                    Criar orçamento
+                                </Button>
+                            </Group>
+                        </Stack>
                     </form>
-                </section>
-            </div>
-        </main>
+                </Card>
+            </Stack>
+        </Container>
     );
 }

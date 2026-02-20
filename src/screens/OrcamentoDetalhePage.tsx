@@ -13,13 +13,25 @@ import { criarItem } from "@/services/item.service";
 import AddItemForm from "@/components/AddItem";
 import EditItemModal from "@/components/EditItemModal";
 import MedicoesSection from "@/components/MedicoesSection";
+import {
+    Badge,
+    Button,
+    Card,
+    Container,
+    Group,
+    ScrollArea,
+    SimpleGrid,
+    Stack,
+    Table,
+    Text,
+    Title,
+} from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 
 export default function OrcamentoDetalhePage() {
     const router = useRouter();
     const params = useParams<{ id: string }>();
-
     const orcamentoId = Number(params.id);
-
     const [orcamento, setOrcamento] = useState<Orcamento>({
         id:0,
         numeroProtocolo:"",
@@ -42,6 +54,8 @@ export default function OrcamentoDetalhePage() {
         quantidadeAcumulada:0, 
         orcamentoId:0
     });
+    const statusColor = orcamento.status === 'ABERTO' ? 'yellow' : 'green';
+    const isMobile = useMediaQuery('(max-width: 48em)');
 
     function openEdit(item: Item) {
         setSelectedItem(item);
@@ -112,72 +126,75 @@ export default function OrcamentoDetalhePage() {
     };
 
     return (
-        <main className="min-h-screen bg-gray-50">
-            <div className="mx-auto max-w-5xl px-4 py-8">
-                <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <Container size="lg" py="md">
+            <Stack gap="md">
+                <Group justify="space-between" align="flex-start" wrap="wrap">
                     <div>
-                        <h1 className="text-2xl font-semibold text-gray-900">Detalhe do Orçamento</h1>
-                        <p className="mt-1 text-sm text-gray-600">
-                            Protocolo: <span className="font-medium text-gray-900">{orcamento.numeroProtocolo}</span>
-                        </p>
+                        <Title order={2}>Detalhe do Orçamento</Title>
+                        <Text size="sm" c="dimmed" mt={4}>
+                            Protocolo:{' '}
+                            <Text component="span" fw={600} c="dark">
+                            {orcamento.numeroProtocolo}
+                            </Text>
+                        </Text>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                        <button type="button" className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50"
-                            onClick={() => router.push("/orcamentos")}>
+                    <Group gap="sm" wrap="wrap" style={{ width: isMobile ? '100%' : 'auto' }}>
+                        <Button variant="default" onClick={() => router.push('/orcamentos')} fullWidth={isMobile}>
                             Voltar
-                        </button>
+                        </Button>
+                        <Button onClick={handleFinalizar} disabled={!podeFinalizar} loading={isFinalizando} fullWidth={isMobile}>
+                            Finalizar orçamento
+                        </Button>
+                    </Group>
+                </Group>
 
-                        <button type="button" onClick={handleFinalizar} disabled={!podeFinalizar || isFinalizando}
-                            className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-60">
-                            {isFinalizando ? "Finalizando..." : "Finalizar orçamento"}
-                        </button>
-                    </div>
-                </header>
+                <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+                    <Card withBorder radius="md" p="md">
+                        <Text size="xs" c="dimmed">Tipo</Text>
+                        <Text size="sm" fw={600} mt={4}>
+                            {orcamento.tipo}
+                        </Text>
+                    </Card>
 
-                <section className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div className="rounded-lg bg-white p-4 shadow-sm ring-1 ring-gray-200">
-                        <p className="text-xs text-gray-500">Tipo</p>
-                        <p className="mt-1 text-sm font-medium text-gray-900">{orcamento.tipo}</p>
-                    </div>
+                    <Card withBorder radius="md" p="md">
+                        <Text size="xs" c="dimmed">
+                            Status
+                        </Text>
+                        <Group mt={6}>
+                            <Badge color={statusColor} variant="light">
+                                {orcamento.status}
+                            </Badge>
+                        </Group>
+                    </Card>
 
-                    <div className="rounded-lg bg-white p-4 shadow-sm ring-1 ring-gray-200">
-                        <p className="text-xs text-gray-500">Status</p>
-                        <p className="mt-1">
-                        <span className={ orcamento.status === "ABERTO"
-                                ? "inline-flex rounded-full bg-yellow-100 px-2 py-1 text-xs font-semibold text-yellow-800"
-                                : "inline-flex rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800"
-                            }>
-                            {orcamento.status}
-                        </span>
-                        </p>
-                    </div>
-
-                    <div className="rounded-lg bg-white p-4 shadow-sm ring-1 ring-gray-200">
-                        <p className="text-xs text-gray-500">Valor total do orçamento</p>
-                        <p className="mt-1 text-sm font-medium text-gray-900">
-                            {Number(orcamento.valorTotal).toLocaleString("pt-BR", {
-                                style: "currency",
-                                currency: "BRL",
+                    <Card withBorder radius="md" p="md">
+                        <Text size="xs" c="dimmed">
+                            Valor total do orçamento
+                        </Text>
+                        <Text size="sm" fw={600} mt={4}>
+                            {Number(orcamento.valorTotal).toLocaleString('pt-BR', {
+                                style: 'currency',
+                                currency: 'BRL',
                             })}
-                        </p>
-                    </div>
+                        </Text>
+                    </Card>
 
-                    <div className="rounded-lg bg-white p-4 shadow-sm ring-1 ring-gray-200">
-                        <p className="text-xs text-gray-500">Soma dos itens</p>
-                        <p className="mt-1 text-sm font-medium text-gray-900">
-                            {Number(somaItens).toLocaleString("pt-BR", {
-                                style: "currency",
-                                currency: "BRL",
+                    <Card withBorder radius="md" p="md">
+                        <Text size="xs" c="dimmed">Soma dos itens</Text>
+                        <Text size="sm" fw={600} mt={4}>
+                            {Number(somaItens).toLocaleString('pt-BR', {
+                                style: 'currency',
+                                currency: 'BRL',
                             })}
-                        </p>
-                        {orcamento.status === "ABERTO" && Number(somaItens) !== Number(orcamento.valorTotal) ? (
-                        <p className="mt-1 text-xs text-gray-500">
-                            Para finalizar, a soma dos itens deve ser igual ao valor total do orçamento.
-                        </p>
+                        </Text>
+                        {orcamento.status === 'ABERTO' && Number(somaItens) !== Number(orcamento.valorTotal) ? (
+                            <Text size="xs" c="dimmed" mt={6}>
+                                Para finalizar, a soma dos itens deve ser igual ao valor total do orçamento.
+                            </Text>
                         ) : null}
-                    </div>
-                </section>
+                    </Card>
+                </SimpleGrid>
 
                 <AddItemForm
                     orcamentoId={orcamento.id}
@@ -185,74 +202,74 @@ export default function OrcamentoDetalhePage() {
                     onCreated={load}
                     onError={(message) => setError(message)}/>
 
-                <section className="mt-6 rounded-lg bg-white shadow-sm ring-1 ring-gray-200">
-                    <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
-                        <h2 className="text-sm font-medium text-gray-900">Itens do orçamento</h2>
-                    </div>
+                <Card withBorder radius="md" padding={0}>
+                    <Group px="md" py="sm" justify="space-between" style={{ borderBottom:'1px solid var(--mantine-color-gray-3)'}}>
+                        <Text size="sm" fw={600}>Itens do orçamento</Text>
+                    </Group>
 
                     {itens.length === 0 ? (
-                        <div className="px-4 py-6 text-sm text-gray-600">Nenhum item cadastrado.</div>
+                        <Text px="md" py="md" size="sm" c="dimmed">Nenhum item cadastrado</Text>
                     ) : (
-                        <div className="overflow-x-auto">
-                            <table className="w-full border-collapse">
-                                <thead className="bg-gray-50">
-                                    <tr className="text-left text-xs font-semibold text-gray-600">
-                                        <th className="px-4 py-3">Descrição</th>
-                                        <th className="px-4 py-3">Qtd</th>
-                                        <th className="px-4 py-3">V. Unit</th>
-                                        <th className="px-4 py-3">V. Total</th>
-                                        <th className="px-4 py-3">Qtd Acumulada</th>
-                                        <th className="px-4 py-3">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                {itens.map((item) => (
-                                    <tr key={item.id} className="border-t border-gray-200 text-sm">
-                                        <td className="px-4 py-3 text-gray-900">{item.descricao}</td>
-                                        <td className="px-4 py-3 text-gray-700">{Number(item.quantidade)}</td>
-                                        <td className="px-4 py-3 text-gray-700">
-                                            {Number(item.valorUnitario).toLocaleString("pt-BR", {
-                                            style: "currency",
-                                            currency: "BRL",
-                                            })}
-                                        </td>
-                                        <td className="px-4 py-3 text-gray-700">
-                                            {Number(item.valorTotal).toLocaleString("pt-BR", {
-                                            style: "currency",
-                                            currency: "BRL",
-                                            })}
-                                        </td>
-                                        <td className="px-4 py-3 text-gray-700">
-                                            {Number(item.quantidadeAcumulada)}
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            <button
-                                                type="button"
-                                                className="rounded-md border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-900 hover:bg-gray-50 disabled:opacity-60"
-                                                onClick={() => openEdit(item)}
-                                                disabled={orcamento.status !== "ABERTO"}
-                                            >
-                                                Editar
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                                </tbody>
-                            </table>
+                        <ScrollArea>
+                            <Table striped highlightOnHover miw={1000}>
+                                <Table.Thead>
+                                    <Table.Tr>
+                                        <Table.Th>Descrição</Table.Th>
+                                        <Table.Th>Qtd</Table.Th>
+                                        <Table.Th>V. Unit</Table.Th>
+                                        <Table.Th>V. Total</Table.Th>
+                                        <Table.Th>Qtd Acumulada</Table.Th>
+                                        <Table.Th>Ações</Table.Th>
+                                    </Table.Tr>
+                                </Table.Thead>
+                                <Table.Tbody>
+                                    {itens.map((item) => (
+                                        <Table.Tr key={item.id}>
+                                            <Table.Td><Text size="sm">{item.descricao}</Text></Table.Td>
+                                            <Table.Td>
+                                                <Text size="sm" c="dimmed">
+                                                    {Number(item.quantidade)}
+                                                </Text>
+                                            </Table.Td>
+                                            <Table.Td>
+                                                <Text size="sm" c="dimmed">
+                                                    {Number(item.valorUnitario).toLocaleString("pt-BR", {
+                                                        style: "currency",
+                                                        currency: "BRL",
+                                                    })}
+                                                </Text>
+                                            </Table.Td>
+                                            <Table.Td>
+                                                <Text size="sm" c="dimmed">
+                                                    {Number(item.valorTotal).toLocaleString("pt-BR", {
+                                                        style: "currency",
+                                                        currency: "BRL",
+                                                    })}
+                                                </Text>
+                                            </Table.Td>
+                                            <Table.Td>
+                                                <Text size="sm" c="dimmed">{Number(item.quantidadeAcumulada)}</Text>
+                                            </Table.Td>
+                                            <Table.Td>
+                                                <Button variant="default" size="xs" disabled={orcamento.status !== 'ABERTO'} onClick={() => openEdit(item)} fullWidth={isMobile}>                                                    
+                                                    Editar
+                                                </Button>
+                                            </Table.Td>
+                                        </Table.Tr >
+                                    ))}
+                                </Table.Tbody>
+                            </Table>
                             <EditItemModal
                                 isOpen={isEditOpen}
                                 item={selectedItem}
                                 isDisabled={orcamento.status !== "ABERTO"}
                                 onClose={closeEdit}
                                 onUpdated={load}/>
-                        </div>
+                        </ScrollArea>
                     )}
-                </section>
-                <MedicoesSection
-                    orcamentoId={orcamento.id}
-                    itensOrcamento={itens}
-                    isOrcamentoFinalizado={orcamento.status !== "ABERTO"}/>
-            </div>
-        </main>
+                </Card>
+                <MedicoesSection orcamentoId={orcamento.id} itensOrcamento={itens} isOrcamentoFinalizado={orcamento.status !== "ABERTO"}/>
+            </Stack>
+        </Container>
     );
 }

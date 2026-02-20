@@ -3,6 +3,18 @@
 import { useEffect, useState } from "react";
 import type { Item } from "@/types/item";
 import { atualizarItem } from "@/services/item.service";
+import {
+    Alert,
+    Button,
+    Modal,
+    SimpleGrid,
+    Stack,
+    Text,
+    TextInput,
+    NumberInput,
+    Group,
+} from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 
 type Props = {
     isOpen: boolean;
@@ -16,9 +28,9 @@ export default function EditItemModal({ isOpen, item, isDisabled, onClose, onUpd
     const [descricao, setDescricao] = useState<string>("");
     const [quantidade, setQuantidade] = useState<number>(0);
     const [valorUnitario, setValorUnitario] = useState<number>(0);
-
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const isMobile = useMediaQuery('(max-width: 48em)');
 
     useEffect(() => {
         setDescricao(item.descricao ?? "");
@@ -26,8 +38,6 @@ export default function EditItemModal({ isOpen, item, isDisabled, onClose, onUpd
         setValorUnitario(item.valorUnitario ?? "");
         setError(null);
     }, [item, isOpen]);
-
-    if (!isOpen) return null;
 
     const handleSubmit = async function (e: React.SubmitEvent) {
         e.preventDefault();
@@ -68,53 +78,51 @@ export default function EditItemModal({ isOpen, item, isDisabled, onClose, onUpd
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
-            <div className="w-full max-w-lg rounded-lg bg-white shadow-lg ring-1 ring-gray-200">
-                <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
-                    <h3 className="text-sm font-semibold text-gray-900">Editar item</h3>
-                </div>
-                <form className="space-y-4 px-4 py-4" onSubmit={handleSubmit}>
-                    <div>
-                        <label className="text-sm font-medium text-gray-900">Descrição</label>
-                        <input value={descricao} onChange={(e) => setDescricao(e.target.value)}
-                            className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-400"
-                            disabled={isDisabled || isSubmitting}/>
-                    </div>
+        <Modal opened={isOpen} onClose={onClose} title={<Text size="sm" fw={600}>Editar item</Text>} centered overlayProps={{ opacity: 0.3, blur: 1 }} size="lg" 
+            closeOnClickOutside={!isSubmitting} closeOnEscape={!isSubmitting} withCloseButton={!isSubmitting}>
+            <form onSubmit={handleSubmit}>
+                <Stack gap="sm">
+                    <TextInput label="Descrição" value={descricao} 
+                        onChange={(e) => {
+                            setDescricao(e.currentTarget.value);
+                            if (error) {
+                                setError(null);
+                            }
+                        }} disabled={isDisabled || isSubmitting} required/>
 
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div>
-                        <label className="text-sm font-medium text-gray-900">Quantidade</label>
-                        <input value={quantidade} onChange={(e) => setQuantidade(e.target.value === "" ? 0 : parseFloat(e.target.value))} inputMode="decimal"
-                            className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-400"
-                            disabled={isDisabled || isSubmitting} />
-                        </div>
-
-                        <div>
-                        <label className="text-sm font-medium text-gray-900">Valor unitário</label>
-                        <input value={valorUnitario} onChange={(e) => setValorUnitario(e.target.value === "" ? 0 : parseFloat(e.target.value))} inputMode="decimal"
-                            className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-400"
-                            disabled={isDisabled || isSubmitting}/>
-                        </div>
-                    </div>
+                    <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
+                        <NumberInput label="Quantidade" value={quantidade}
+                            onChange={(value) => {
+                                setQuantidade(typeof value === 'number' ? value : 0);
+                                if (error) {
+                                    setError(null);
+                                }
+                            }} disabled={isDisabled || isSubmitting} min={0} decimalScale={3} hideControls required/>
+                        <NumberInput label="Valor unitário" value={valorUnitario}
+                            onChange={(value) => {
+                                setValorUnitario(typeof value === 'number' ? value : 0);
+                                if (error) {
+                                    setError(null);
+                                }
+                            }} disabled={isDisabled || isSubmitting} min={0} decimalScale={2} hideControls required/>
+                    </SimpleGrid>
 
                     {error ? (
-                        <div className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>
+                        <Alert color="red" variant="light">
+                            {error}
+                        </Alert>
                     ) : null}
 
-                    <div className="flex items-center justify-end gap-3 pt-2">
-                        <button type="button" className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50"
-                        onClick={onClose}
-                        disabled={isSubmitting}>
+                    <Group justify="flex-end" gap="sm" mt="xs" wrap="wrap">
+                        <Button type="button" variant="default" onClick={onClose} disabled={isSubmitting} fullWidth={isMobile}>
                             Cancelar
-                        </button>
-
-                        <button type="submit" className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-60"
-                            disabled={isDisabled || isSubmitting}>
-                            {isSubmitting ? "Salvando..." : "Salvar alterações"}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+                        </Button>
+                        <Button type="submit" loading={isSubmitting} disabled={isDisabled} fullWidth={isMobile}>
+                            Salvar alterações
+                        </Button>
+                    </Group>
+                </Stack>
+            </form>
+        </Modal>
     );
 }

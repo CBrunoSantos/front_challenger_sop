@@ -1,13 +1,25 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { listarOrcamentos } from "@/services/orcamento.service";
-import type { Orcamento } from "@/types/orcamento";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { fetchOrcamentos } from "@/store/slice/orcamentosSlice";
+import {
+    Anchor,
+    Badge,
+    Button,
+    Card,
+    Container,
+    Group,
+    ScrollArea,
+    Stack,
+    Table,
+    Text,
+    Title,
+} from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 
 export default function OrcamentosPage() {
     const router = useRouter();
@@ -15,41 +27,11 @@ export default function OrcamentosPage() {
     const { data, loading, error } = useSelector(
         (state: RootState) => state.orcamentos
     );
+    const isMobile = useMediaQuery('(max-width: 48em)');
 
-    // const load = async() => {
-    //     try {
-    //         setIsLoading(true);
-    //         setError(null);
-    //         const data = await listarOrcamentos();
-    //         if (isMountedRef.current) {
-    //             setOrcamentos(data);
-    //         }
-    //     } catch (error: unknown) {
-    //         if (isMountedRef.current) {
-    //             if (error instanceof Error) {
-    //                 setError(error.message);
-    //             } else {
-    //                 setError("Erro ao carregar orçamentos.");
-    //             }
-    //         }
-    //     } finally {
-    //         if (isMountedRef.current) {
-    //             setIsLoading(false);
-    //         }
-    //     }
-    // }
-
-    // useEffect(() => {
-    //     isMountedRef.current = true;
-    //     load();
-    //     return () => {
-    //         isMountedRef.current = false;
-    //     };
-    // }, []);
-
-      useEffect(() => {
-    dispatch(fetchOrcamentos());
-  }, [dispatch]);
+    useEffect(() => {
+        dispatch(fetchOrcamentos());
+    }, [dispatch]);
     const totalAberto = useMemo(() => {
         return data.filter((o) => o.status === "ABERTO").length;
     }, [data]);
@@ -59,95 +41,93 @@ export default function OrcamentosPage() {
     }, [data]);
 
 return (
-    <main className="min-h-screen bg-gray-50">
-        <div className="mx-auto max-w-5xl px-4 py-8">
-            <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <Container size="lg" py="md">
+        <Stack gap="md">
+            <Group justify="space-between" align="flex-end" wrap="wrap">
                 <div>
-                    <h1 className="text-2xl font-semibold text-gray-900">Orçamentos</h1>
-                    <p className="text-sm text-gray-600">
+                    <Title order={2}>Orçamentos</Title>
+                    <Text size="sm" c="dimmed">
                         Lista de orçamentos cadastrados no sistema.
-                    </p>
+                    </Text>
                 </div>
-                <Link href="/orcamentos/NovoOrcamento" 
-                    className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800">
+                <Button component={Link} href="/orcamentos/NovoOrcamento" fullWidth={isMobile}>
                     Novo orçamento
-                </Link>
+                </Button>
+            </Group>
 
-                <div className="flex gap-3">
-                    <div className="rounded-lg bg-white px-4 py-2 shadow-sm ring-1 ring-gray-200">
-                        <p className="text-xs text-gray-500">Abertos</p>
-                        <p className="text-lg font-semibold text-gray-900">{totalAberto}</p>
-                    </div>
-                    <div className="rounded-lg bg-white px-4 py-2 shadow-sm ring-1 ring-gray-200">
-                        <p className="text-xs text-gray-500">Finalizados</p>
-                        <p className="text-lg font-semibold text-gray-900">{totalFinalizado}</p>
-                    </div>
-                </div>
-            </header>
-            <section className="mt-6 rounded-lg bg-white shadow-sm ring-1 ring-gray-200">
-                <div className="border-b border-gray-200 px-4 py-3">
-                    <h2 className="text-sm font-medium text-gray-900">Resultados</h2>
-                </div>
+            <Group gap="sm" wrap="wrap">
+                <Card withBorder radius="md" p="md" style={{ flex: isMobile ? '1 1 100%' : '0 0 auto' }}>
+                    <Text size="xs" c="dimmed">Abertos</Text>
+                    <Text size="xl" fw={700}>{totalAberto}</Text>
+                </Card>
+                <Card withBorder radius="md" p="md" style={{ flex: isMobile ? '1 1 100%' : '0 0 auto' }}>
+                    <Text size="xs" c="dimmed">Finalizados</Text>
+                    <Text size="xl" fw={700}>{totalFinalizado}</Text>
+                </Card>
+            </Group>
+            <Card withBorder radius="md" padding={0}>
+                <Group px="md" py="sm" style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}>
+                    <Text size="sm" fw={600}>
+                        Resultados
+                    </Text>
+                </Group>
 
                 {loading ? (
-                    <div className="px-4 py-6 text-sm text-gray-600">Carregando...</div>
+                    <Text px="md" py="md" size="sm" c="dimmed">Carregando...</Text>
                 ) : error ? (
-                    <div className="px-4 py-6 text-sm text-red-600">{error}</div>
+                    <Text px="md" py="md" size="sm" c="red">{error}</Text>
                 ) : data.length === 0 ? (
-                    <div className="px-4 py-6 text-sm text-gray-600">
-                        Nenhum orçamento encontrado.
-                    </div>
+                    <Text px="md" py="md" size="sm" c="dimmed">Nenhum orçamento encontrado.</Text>
                 ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full border-collapse">
-                            <thead className="bg-gray-50">
-                                <tr className="text-left text-xs font-semibold text-gray-600">
-                                    <th className="px-4 py-3">Protocolo</th>
-                                    <th className="px-4 py-3">Tipo</th>
-                                    <th className="px-4 py-3">Valor</th>
-                                    <th className="px-4 py-3">Data</th>
-                                    <th className="px-4 py-3">Status</th>
-                                    <th className="px-4 py-3">Ação</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {data.map((o) => (
-                                    <tr key={o.id} className="border-t border-gray-200 text-sm">
-                                        <td className="px-4 py-3 text-gray-900">
-                                            <Link href={`/orcamentos/${o.id}`} className="text-gray-900 hover:underline">
-                                                {o.numeroProtocolo}
-                                            </Link>
-                                        </td>
-                                        <td className="px-4 py-3 text-gray-700">{o.tipo}</td>
-                                        <td className="px-4 py-3 text-gray-700">
-                                            {Number(o.valorTotal).toLocaleString("pt-BR", {
-                                                style: "currency",
-                                                currency: "BRL",
-                                            })}
-                                        </td>
-                                        <td className="px-4 py-3 text-gray-700">{o.dataCriacao}</td>
-                                        <td className="px-4 py-3">
-                                            <span className={ o.status === "ABERTO"
-                                                    ? "inline-flex rounded-full bg-yellow-100 px-2 py-1 text-xs font-semibold text-yellow-800"
-                                                    : "inline-flex rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800"
-                                                }>
-                                                {o.status}
-                                            </span>
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            <button type="button" onClick={() => router.push(`/orcamentos/${o.id}`)}
-                                                className="rounded-md border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-900 hover:bg-gray-50">
-                                                Visualizar
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                    <ScrollArea>
+                        <Table striped highlightOnHover withTableBorder={false} withColumnBorders={false} miw={900}>
+                            <Table.Thead>
+                                <Table.Tr>
+                                    <Table.Th>Protocolo</Table.Th>
+                                    <Table.Th>Tipo</Table.Th>
+                                    <Table.Th>Valor</Table.Th>
+                                    <Table.Th>Data</Table.Th>
+                                    <Table.Th>Status</Table.Th>
+                                </Table.Tr>
+                            </Table.Thead>
+                            <Table.Tbody>
+                                {data.map((o) => {
+                                    const badgeColor = o.status === 'ABERTO' ? 'yellow' : 'green';
+                                    return(
+                                        <Table.Tr key={o.id}>
+                                            <Table.Td>
+                                                <Anchor component={Link} href={`/orcamentos/${o.id}`} size="sm" c="dark" underline="hover">
+                                                    {o.numeroProtocolo}
+                                                </Anchor>
+                                            </Table.Td>
+                                            <Table.Td>
+                                                <Text size="sm" c="dimmed">{o.tipo}</Text>
+                                            </Table.Td>
+                                            <Table.Td>
+                                                <Text size="sm" c="dimmed">
+                                                    {Number(o.valorTotal).toLocaleString("pt-BR", {
+                                                        style: "currency",
+                                                        currency: "BRL",
+                                                    })}
+                                                </Text>
+                                            </Table.Td>
+                                            <Table.Td>
+                                                <Text size="sm" c="dimmed">{o.dataCriacao}</Text>
+                                            </Table.Td>
+                                            <Table.Td>
+                                                <Badge color={badgeColor} variant="light">
+                                                    {o.status}
+                                                </Badge>
+                                            </Table.Td>
+                                        </Table.Tr>
+                                    )
+                                })}
+                            </Table.Tbody>
+                        </Table>
+                    </ScrollArea>
                 )}
-            </section>
-        </div>
-    </main>
+            </Card>
+        </Stack>
+    </Container>
 );
 }

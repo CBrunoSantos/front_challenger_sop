@@ -4,6 +4,17 @@ import { useEffect, useMemo, useState } from "react";
 import type { Item } from "@/types/item";
 import type { ItemMedicao } from "@/types/medicao";
 import { adicionarOuAtualizarItemMedicao, listarItensDaMedicao } from "@/services/medicao.service";
+import {
+    Alert,
+    Button,
+    Card,
+    Group,
+    NumberInput,
+    ScrollArea,
+    Stack,
+    Table,
+    Text,
+} from '@mantine/core';
 
 type Props = {
     medicaoId: number;
@@ -80,78 +91,94 @@ export default function MedicaoAbertaEditor({ medicaoId, itensOrcamento, onChang
     }, [itensMedicao]);
 
     return (
-        <div className="mt-6 rounded-md border border-gray-200 p-4">
-            <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-gray-900">Medição ABERTA: lançar itens</h3>
-                {isLoading ? <span className="text-xs text-gray-500">Carregando...</span> : null}
-            </div>
-
-            <div className="mt-1 text-xs text-gray-600">
-                Subtotal da medição (itens lançados):{" "}
-                <span className="font-semibold text-gray-900">
-                    {Number(subtotalMedicao).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
-                </span>
-            </div>
-
+        <Card withBorder radius="md" p="md" mt="md">
+            <Group justify="space-between" align="center" wrap="wrap">
+                <Text size="sm" fw={600}>
+                    Medição ABERTA: lançar itens
+                </Text>
+                {isLoading ? ( <Text size="xs" c="dimmed"> Carregando...</Text>) : null}
+            </Group>
+            <Text size="xs" c="dimmed" mt={6}>
+                Subtotal da medição (itens lançados):{' '}
+                <Text component="span" fw={700} c="dark">
+                    {Number(subtotalMedicao).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                </Text>
+            </Text>
             {error ? (
-                <div className="mt-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>
+            <Alert color="red" variant="light" mt="sm">
+                {error}
+            </Alert>
             ) : null}
 
-            <div className="mt-3 overflow-x-auto">
-                <table className="w-full border-collapse">
-                    <thead className="bg-gray-50">
-                        <tr className="text-left text-xs font-semibold text-gray-600">
-                            <th className="px-3 py-2">Item</th>
-                            <th className="px-3 py-2">Qtd total</th>
-                            <th className="px-3 py-2">Qtd acumulada</th>
-                            <th className="px-3 py-2">Restante</th>
-                            <th className="px-3 py-2">Qtd nesta medição</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {itensOrcamento.map((item) => {
-                            const existente = byItemId.get(item.id);
-                            const value = quantidades[item.id] ?? (existente ? String(existente.quantidadeMedida) : "");
-                            const saving = Boolean(isSubmitting[item.id]);
-                            const restante = Number(item.quantidade) - Number(item.quantidadeAcumulada);
-                            const restanteSeguro = restante < 0 ? 0 : restante;
-                            const bloqueadoPorRestante = restanteSeguro <= 0;
+            <Stack gap="sm" mt="md">
+                <ScrollArea>
+                    <Table striped highlightOnHover miw={1000}>
+                        <Table.Thead>
+                            <Table.Tr>
+                                <Table.Th>Item</Table.Th>
+                                <Table.Th>Qtd total</Table.Th>
+                                <Table.Th>Qtd acumulada</Table.Th>
+                                <Table.Th>Restante</Table.Th>
+                                <Table.Th>Qtd nesta medição</Table.Th>
+                                <Table.Th>Ação</Table.Th>
+                            </Table.Tr>
+                        </Table.Thead>
+                        <Table.Tbody>
+                            {itensOrcamento.map((item) => {
+                                const existente = byItemId.get(item.id);
+                                const value = quantidades[item.id] ?? (existente ? String(existente.quantidadeMedida) : "");
+                                const saving = Boolean(isSubmitting[item.id]);
+                                const restante = Number(item.quantidade) - Number(item.quantidadeAcumulada);
+                                const restanteSeguro = restante < 0 ? 0 : restante;
+                                const bloqueadoPorRestante = restanteSeguro <= 0;
 
-                            return (
-                                <tr key={item.id} className="border-t border-gray-200 text-sm">
-                                    <td className="px-3 py-2 text-gray-900">{item.descricao}</td>
-                                    <td className="px-3 py-2 text-gray-700">{Number(item.quantidade)}</td>
-                                    <td className="px-3 py-2 text-gray-700">{Number(item.quantidadeAcumulada)}</td>
-                                    <td className="px-3 py-2 text-gray-700">{restanteSeguro}</td>
-                                    <td className="px-3 py-2">
-                                        <input value={value}
-                                            onChange={(e) =>
-                                                setQuantidades((prev) => ({ ...prev, [item.id]: e.target.value }))
-                                            }
-                                            inputMode="decimal"
-                                            className="w-32 rounded-md border border-gray-300 px-2 py-1 text-sm text-gray-900 outline-none focus:border-gray-400"
-                                            disabled={saving || bloqueadoPorRestante}/>
+                                return (
+                                    <Table.Tr key={item.id}>
+                                        <Table.Td> 
+                                            <Text size="sm">{item.descricao}</Text>
+                                        </Table.Td>
+                                        <Table.Td> 
+                                            <Text size="sm" c="dimmed"> {Number(item.quantidade)} </Text>
+                                        </Table.Td>
+                                        <Table.Td> 
+                                            <Text size="sm" c="dimmed">{Number(item.quantidadeAcumulada)}</Text>
+                                        </Table.Td>
+                                        <Table.Td> 
+                                            <Text size="sm" c="dimmed"> {restanteSeguro}</Text> 
+                                        </Table.Td>
+                                        <Table.Td>
+                                            <Stack gap={4}>
+                                                <NumberInput value={value}
+                                                    onChange={(val) => {
+                                                        setQuantidades((prev) => ({
+                                                            ...prev,
+                                                            [item.id]:
+                                                            val === null || val === '' ? '' : String(val),
+                                                        }));
+                                                    }}
+                                                    inputMode="decimal"
+                                                    className="w-32 rounded-md border border-gray-300 px-2 py-1 text-sm text-gray-900 outline-none focus:border-gray-400"
+                                                    disabled={saving || bloqueadoPorRestante}/>
 
-                                            {bloqueadoPorRestante ? (
-                                                <div className="mt-1 text-xs text-gray-500">
+                                                {bloqueadoPorRestante ? (
+                                                    <Text size="xs" c="dimmed">
                                                     Item já totalmente medido.
-                                                </div>
+                                                    </Text>
                                                 ) : null}
-                                    </td>
-                                    <td className="px-3 py-2">
-                                        <button type="button" onClick={() => handleSalvar(item.id)}
-                                            disabled={saving || bloqueadoPorRestante}
-                                            className="rounded-md bg-gray-900 px-3 py-1 text-xs font-medium text-white hover:bg-gray-800 disabled:opacity-60">
-                                            {saving ? "Salvando..." : existente ? "Atualizar" : "Adicionar"}
-                                        </button>
-                                    </td>
-                                    
-                                </tr>
-                            );
-                        })};
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                                            </Stack>
+                                        </Table.Td>
+                                        <Table.Td>
+                                            <Button type="button" size="xs" loading={saving} disabled={bloqueadoPorRestante} onClick={() => handleSalvar(item.id)} >
+                                                {existente ? 'Atualizar' : 'Adicionar'}
+                                            </Button>
+                                        </Table.Td>
+                                    </Table.Tr>
+                                );
+                            })}
+                        </Table.Tbody>
+                    </Table>
+                </ScrollArea>
+            </Stack>
+        </Card>
     );
 }

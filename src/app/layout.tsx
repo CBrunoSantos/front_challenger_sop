@@ -1,17 +1,13 @@
 "use client";
-import { Provider } from "react-redux";
 import "./globals.css";
-import { store } from "@/store/store";
+import '@mantine/core/styles.css';
+import Providers from '@/app/provider';
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children}: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <Provider store={store}>{children}</Provider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
